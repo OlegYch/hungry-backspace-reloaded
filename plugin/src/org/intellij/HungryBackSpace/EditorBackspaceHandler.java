@@ -1,16 +1,26 @@
 /*     */ package org.intellij.HungryBackSpace;
 /*     */ 
-/*     */ import com.intellij.openapi.actionSystem.DataContext;
-/*     */ import com.intellij.openapi.application.Application;
-/*     */ import com.intellij.openapi.application.ApplicationManager;
-/*     */ import com.intellij.openapi.editor.CaretModel;
-/*     */ import com.intellij.openapi.editor.Document;
-/*     */ import com.intellij.openapi.editor.Editor;
-/*     */ import com.intellij.openapi.editor.SelectionModel;
-/*     */ import com.intellij.openapi.editor.VisualPosition;
-/*     */ import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
-/*     */ import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
-/*     */ import com.intellij.openapi.util.TextRange;
+/*     */
+
+import com.google.common.base.Optional;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
+import com.intellij.openapi.util.TextRange;
+
+/*     */
+/*     */
+/*     */
+/*     */
+/*     */
+/*     */
+/*     */
+/*     */
+/*     */
+/*     */
 /*     */ 
 /*     */ public class EditorBackspaceHandler extends EditorWriteActionHandler
 /*     */ {
@@ -44,7 +54,7 @@
 /*  52 */         return;
 /*     */       }
 /*     */ 
-/*  55 */       char[] text = document.getChars();
+/*  55 */       CharSequence text = document.getCharsSequence();
 /*  56 */       VisualPosition visualPosition = caretModel.getVisualPosition();
 /*  57 */       int vline = visualPosition.line;
 /*  58 */       int vcolumn = visualPosition.column;
@@ -61,7 +71,7 @@
 /*  96 */       int startOffset = 0;
 /*  97 */       for (int i = endOffset; i > 1; i--)
 /*     */       {
-/*  99 */         if (!Character.isWhitespace(text[(i - 1)])) {
+/*  99 */         if (!Character.isWhitespace(text.charAt(i - 1))) {
 /* 100 */           if (containsWS) {
 /* 101 */             startOffset = i; break;
 /*     */           }
@@ -82,12 +92,12 @@
 /*     */       {
 /* 124 */         VisualPosition startVP = editor.offsetToVisualPosition(startOffset);
 /* 125 */         VisualPosition endVP = editor.offsetToVisualPosition(endOffset);
-/* 126 */         TextRange lineRange = GetLineRange(editor, endVP.line);
+/* 126 */         TextRange lineRange = GetLineRange(editor, endVP.line).or(TextRange.EMPTY_RANGE);
 /* 127 */         boolean hasTextBefore = false;
 /* 128 */         boolean hasTextAfter = false;
 /* 129 */         boolean isLineBlank = true;
 /* 130 */         for (int i = lineRange.getStartOffset(); i <= lineRange.getEndOffset(); i++) {
-/* 131 */           if (!Character.isWhitespace(text[i])) {
+/* 131 */           if (text.length() >= i && !Character.isWhitespace(text.charAt(i))) {
 /* 132 */             isLineBlank = false;
 /* 133 */             if (i < endOffset)
 /* 134 */               hasTextBefore = true;
@@ -138,11 +148,11 @@
 /* 192 */     return GetStartOfLineOffset(editor, line + 1) - 1;
 /*     */   }
 /*     */ 
-/*     */   public static TextRange GetLineRange(Editor editor, int line)
+/*     */   public static Optional<TextRange> GetLineRange(Editor editor, int line)
 /*     */   {
 /* 199 */     int startOffset = GetStartOfLineOffset(editor, line);
 /* 200 */     int endOffset = GetEndOfLineOffset(editor, line);
-/* 201 */     return new TextRange(startOffset, endOffset);
+/* 201 */     return (startOffset < 0 || startOffset > endOffset) ? Optional.<TextRange>absent(): Optional.of(new TextRange(startOffset, endOffset)) ;
 /*     */   }
 /*     */ }
 
