@@ -1,5 +1,5 @@
 <idea-plugin version="2">
-    <id>com.your.company.unique.plugin.id</id>
+    <id>com.olegych.hungry.backspace.reloaded</id>
     <name>Hungry Backspace Reloaded</name>
     <version>1.0</version>
     <vendor url="https://github.com/OlegYch/hungry-backspace-reloaded">OlegYch</vendor>
