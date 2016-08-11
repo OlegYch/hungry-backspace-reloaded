@@ -1,0 +1,47 @@
+<idea-plugin version="2">
+    <id>com.your.company.unique.plugin.id</id>
+    <name>Hungry Backspace Reloaded</name>
+    <version>1.0</version>
+    <vendor url="https://github.com/OlegYch/hungry-backspace-reloaded">OlegYch</vendor>
+
+    <description><![CDATA[
+      Modifies BackSpace key to hungrily delete whitespace.<br>
+      Updated version of https://plugins.jetbrains.com/plugin/162<br>
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Updated to be compatible with IDEA 2016.<br>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="141.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <application-components>
+        <component>
+            <implementation-class>org.intellij.HungryBackSpace.HungryBackSpaceComponent</implementation-class>
+        </component>
+    </application-components>
+    <actions>
+        <group>
+            <separator/>
+            <action
+                    id="HungryBackSpace.StopAtIndent"
+                    class="org.intellij.HungryBackSpace.HungryBackSpaceStopAtIndentAction"
+                    text="Hungry _Backspace Stops At Indentation"
+            />
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
+    </actions>
+
+</idea-plugin>
