@@ -1,55 +1,39 @@
 /*    */ package org.intellij.HungryBackSpace;
-/*    */ 
-/*    */ import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ApplicationComponent;
+/*    */
+/*    */
+
+import com.intellij.ide.ApplicationInitializedListener;
+import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 
 /*    */
 /*    */
 /*    */
 /*    */
 /*    */
-/*    */ 
-/*    */ public class HungryBackSpaceComponent
-/*    */   implements ApplicationComponent
+/*    */
+/*    */ public class HungryBackSpaceComponent implements ApplicationInitializedListener
 /*    */ {
-/* 12 */   private boolean mIsStopAtIndent = true;
-/*    */   static EditorActionHandler defaultEnterHandler;
-/*    */   static EditorActionHandler backspaceHandler;
-/*    */ 
-/*    */   public String getComponentName()
+            private static String stopAtIndentName = "HungryBackspaceReloaded.StopAtIndent";
+            private static boolean defaultStopAtIndent = true;
+
+    /*    */   public static boolean isStopAtIndent() {
+/* 22 */
+            return PropertiesComponent.getInstance().getBoolean(stopAtIndentName, defaultStopAtIndent);
+/*    */   }
+/*    */
+    @Override
+    public void componentsInitialized() {
+        /* 26 */     ActionManager amgr = ActionManager.getInstance();
+        /* 28 */     EditorAction backSpaceAction = (EditorAction)amgr.getAction("EditorBackSpace");
+        /* 31 */     EditorAction enterAction = (EditorAction)amgr.getAction("EditorEnter");
+        /* 34 */     backSpaceAction.setupHandler(new EditorBackspaceHandler(backSpaceAction.getHandler(), enterAction.getHandler()));
+    }
+/*    */   public static void setStopAtIndent(boolean value)
 /*    */   {
-/* 18 */     return "HungryBackSpace.Plugin";
-/*    */   }
-/*    */ 
-/*    */   boolean isStopAtIndent() {
-/* 22 */     return this.mIsStopAtIndent;
-/*    */   }
-/*    */ 
-/*    */   public void initComponent() {
-/* 26 */     ActionManager amgr = ActionManager.getInstance();
-/*    */ 
-/* 28 */     EditorAction backSpaceAction = (EditorAction)amgr.getAction("EditorBackSpace");
-/* 29 */     backspaceHandler = backSpaceAction.getHandler();
-/*    */ 
-/* 31 */     EditorAction enterAction = (EditorAction)amgr.getAction("EditorEnter");
-/* 32 */     defaultEnterHandler = enterAction.getHandler();
-/*    */ 
-/* 34 */     backSpaceAction.setupHandler(new EditorBackspaceHandler(backspaceHandler));
-/*    */   }
-/*    */ 
-/*    */   public void disposeComponent() {
-/*    */   }
-/*    */ 
-/*    */   static HungryBackSpaceComponent getInstance() {
-/* 41 */     return (HungryBackSpaceComponent)ApplicationManager.getApplication().getComponent(HungryBackSpaceComponent.class);
-/*    */   }
-/*    */ 
-/*    */   public void toggleStopAtIndent()
-/*    */   {
-/* 50 */     this.mIsStopAtIndent = (!this.mIsStopAtIndent);
+/* 50 */
+                PropertiesComponent.getInstance().setValue(stopAtIndentName, value, defaultStopAtIndent);
 /*    */   }
 /*    */ }
 

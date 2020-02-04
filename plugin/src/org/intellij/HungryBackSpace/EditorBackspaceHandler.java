@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
 import com.intellij.openapi.util.TextRange;
+import org.jetbrains.annotations.Nullable;
 
 /*     */
 /*     */
@@ -25,37 +26,38 @@ import com.intellij.openapi.util.TextRange;
 /*     */ public class EditorBackspaceHandler extends EditorWriteActionHandler
 /*     */ {
 /*     */   protected EditorActionHandler mOrigHandler;
+/*     */   protected EditorActionHandler defaultEnterHandler;
 /*     */   protected Application mApplication;
 /*     */ 
-/*     */   public EditorBackspaceHandler(EditorActionHandler origHandler)
+/*     */   public EditorBackspaceHandler(EditorActionHandler origHandler, EditorActionHandler defaultEnterHandler)
 /*     */   {
 /*  27 */     this.mOrigHandler = origHandler;
+/*  27 */     this.defaultEnterHandler = defaultEnterHandler;
 /*  28 */     this.mApplication = ApplicationManager.getApplication();
 /*     */   }
-/*     */ 
-/*     */   public void executeWriteAction(Editor editor, DataContext dataContext)
-/*     */   {
+
+            @Override
+            public void executeWriteAction(Editor editor, @Nullable Caret nullableCaret, DataContext dataContext) {
 /*  35 */     if (editor == null)
 /*     */     {
-/*  37 */       this.mOrigHandler.execute(editor, dataContext);
-/*     */     }
-/*     */     else {
+/*  37 */       this.mOrigHandler.execute(editor, nullableCaret, dataContext);
+              } else {
 /*  40 */       Document document = editor.getDocument();
 /*  41 */       if (!document.isWritable()) {
-/*  42 */         this.mOrigHandler.execute(editor, dataContext);
+/*  42 */         this.mOrigHandler.execute(editor, nullableCaret, dataContext);
 /*  43 */         return;
 /*     */       }
-/*  45 */       CaretModel caretModel = editor.getCaretModel();
 /*  46 */       SelectionModel selectionModel = editor.getSelectionModel();
 /*     */ 
 /*  49 */       if (selectionModel.hasSelection())
 /*     */       {
-/*  51 */         this.mOrigHandler.execute(editor, dataContext);
+/*  51 */         this.mOrigHandler.execute(editor, nullableCaret, dataContext);
 /*  52 */         return;
 /*     */       }
 /*     */ 
 /*  55 */       CharSequence text = document.getCharsSequence();
-/*  56 */       VisualPosition visualPosition = caretModel.getVisualPosition();
+                CaretModel caretModel = editor.getCaretModel();
+                    /*  56 */       VisualPosition visualPosition = caretModel.getVisualPosition();
 /*  57 */       int vline = visualPosition.line;
 /*  58 */       int vcolumn = visualPosition.column;
 /*  59 */       int endOffset = caretModel.getOffset();
@@ -84,11 +86,11 @@ import com.intellij.openapi.util.TextRange;
 /*     */ 
 /* 111 */       if (!containsWS)
 /*     */       {
-/* 115 */         this.mOrigHandler.execute(editor, dataContext);
+/* 115 */         this.mOrigHandler.execute(editor, nullableCaret, dataContext);
 /* 116 */         return;
 /*     */       }
 /*     */ 
-/* 122 */       if (HungryBackSpaceComponent.getInstance().isStopAtIndent())
+/* 122 */       if (HungryBackSpaceComponent.isStopAtIndent())
 /*     */       {
 /* 124 */         VisualPosition startVP = editor.offsetToVisualPosition(startOffset);
 /* 125 */         VisualPosition endVP = editor.offsetToVisualPosition(endOffset);
@@ -117,7 +119,7 @@ import com.intellij.openapi.util.TextRange;
 /* 149 */           caretModel.moveToOffset(startOffset);
 /* 150 */           document.deleteString(startOffset, endOffset);
 /*     */ 
-/* 152 */           HungryBackSpaceComponent.defaultEnterHandler.execute(editor, dataContext);
+/* 152 */           defaultEnterHandler.execute(editor, nullableCaret, dataContext);
 /* 153 */           if (endVP.line - startVP.line <= 1)
 /*     */           {
 /* 159 */             int indentOffset = caretModel.getOffset();

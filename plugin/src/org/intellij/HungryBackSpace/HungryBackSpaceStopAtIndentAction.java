@@ -5,18 +5,14 @@
 /*    */ 
 /*    */ public class HungryBackSpaceStopAtIndentAction extends ToggleAction
 /*    */ {
-/*    */   private static HungryBackSpaceComponent getHungryBackSpaceComponent()
-/*    */   {
-/* 17 */     return HungryBackSpaceComponent.getInstance();
-/*    */   }
-/*    */ 
+/*    */
 /*    */   public boolean isSelected(AnActionEvent e) {
-/* 21 */     return getHungryBackSpaceComponent().isStopAtIndent();
+/* 21 */     return HungryBackSpaceComponent.isStopAtIndent();
 /*    */   }
 /*    */ 
 /*    */   public void setSelected(AnActionEvent e, boolean state)
 /*    */   {
-/* 28 */     getHungryBackSpaceComponent().toggleStopAtIndent();
+/* 28 */     HungryBackSpaceComponent.setStopAtIndent(state);
 /*    */   }
 /*    */ }
 
